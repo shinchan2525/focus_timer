@@ -1,0 +1,13 @@
+# ビルド結果
+build/
+build-*/
+
+# Qt Creator の個人設定
+*.user
+*.user.*
+
+# VS Code の個人設定
+.vscode/
+
+# Windows
+Thumbs.db
