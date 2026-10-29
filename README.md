@@ -3,8 +3,7 @@
 作業に集中するための、シンプルな25分カウントダウンタイマーです。
 C++ と Qt Widgets で作成した Windows 向けデスクトップアプリです。
 
-<!-- スクリーンショットを撮ったら docs/screenshot.png に置いて、下の行の先頭の <!-- と末尾の --> を消してください -->
-[アプリ画面](.\docs\screenshot.png) 
+![アプリ画面](docs/screenshot.png)
 
 ## 主な機能
 
