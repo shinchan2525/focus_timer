@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -80,6 +81,7 @@ void MainWindow::onTick()
             m_mode = Mode::Work;
             m_remainingSeconds = kWorkSeconds;
         }
+        QApplication::beep();
         updateDisplay();
     }
 }
