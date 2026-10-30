@@ -6,6 +6,9 @@
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QLineEdit>
+#include <QDateTime>
+#include <QFile>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -80,6 +83,7 @@ void MainWindow::onTick()
     if (m_remainingSeconds == 0) {
         if(m_mode == Mode::Work) {
             m_mode = Mode::Break;
+            appendWorkLog();
             m_remainingSeconds = kBreakSeconds;
         } else {
             m_mode = Mode::Work;
@@ -103,4 +107,21 @@ void MainWindow::updateDisplay()
     } else {
         m_modeLabel->setText("休憩中");
     }
+}
+
+void MainWindow::appendWorkLog()
+{
+    const QString now = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm");
+    QString task = m_taskEdit->text();
+    if(task.isEmpty()) {
+        task = "未入力";
+    }
+
+    QFile file("work_log.csv");
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        return;
+    }
+    int WorkSeconds = kWorkSeconds / 60;
+    QTextStream out(&file);
+    out << now << "," << task << "," << WorkSeconds << "\n";
 }

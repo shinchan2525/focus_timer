@@ -18,11 +18,11 @@ private slots:
     void onStartPause();
     void onReset();
     void onTick();
-
+    
 private:
     enum class Mode{Work, Break};
-
     void updateDisplay();
+    void appendWorkLog();
 
     static constexpr int kWorkSeconds = 25 * 60;
     static constexpr int kBreakSeconds = 5 * 60;
