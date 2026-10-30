@@ -1,18 +1,19 @@
 #include "mainwindow.h"
-
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
+    , m_modeLabel(new QLabel("作業中",this))
     , m_timeLabel(new QLabel(this))
     , m_startButton(new QPushButton("スタート", this))
     , m_resetButton(new QPushButton("リセット", this))
     , m_timer(new QTimer(this))
+    , m_mode(Mode::Work)
     , m_remainingSeconds(kWorkSeconds)
 {
     setWindowTitle("作業タイマー");
@@ -21,12 +22,14 @@ MainWindow::MainWindow(QWidget *parent)
     font.setPointSize(48);
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
+    m_modeLabel->setAlignment(Qt::AlignCenter);
 
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_startButton);
     buttonLayout->addWidget(m_resetButton);
 
     auto *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(m_modeLabel);
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addLayout(buttonLayout);
 
@@ -59,6 +62,7 @@ void MainWindow::onReset()
 {
     m_timer->stop();
     m_remainingSeconds = kWorkSeconds;
+    m_mode = Mode::Work;
     m_startButton->setText("スタート");
     updateDisplay();
 }
@@ -70,9 +74,15 @@ void MainWindow::onTick()
         updateDisplay();
     }
     if (m_remainingSeconds == 0) {
-        m_timer->stop();
-        m_startButton->setText("スタート");
-        QMessageBox::information(this, "完了", "25分おつかれさまでした。休憩しましょう。");
+        if(m_mode == Mode::Work) {
+            m_mode = Mode::Break;
+            m_remainingSeconds = kBreakSeconds;
+        } else {
+            m_mode = Mode::Work;
+            m_remainingSeconds = kWorkSeconds;
+        }
+        QApplication::beep();
+        updateDisplay();
     }
 }
 
@@ -83,4 +93,10 @@ void MainWindow::updateDisplay()
     m_timeLabel->setText(QString("%1:%2")
                              .arg(minutes, 2, 10, QChar('0'))
                              .arg(seconds, 2, 10, QChar('0')));
+
+    if(m_mode == Mode::Work) {
+        m_modeLabel->setText("作業中");
+    } else {
+        m_modeLabel->setText("休憩中");
+    }
 }
