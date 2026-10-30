@@ -5,11 +5,18 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QLineEdit>
+#include <QDateTime>
+#include <QFile>
+#include <QTextStream>
+#include <QDir>
+#include <QStandardPaths>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m_modeLabel(new QLabel("作業中",this))
     , m_timeLabel(new QLabel(this))
+    , m_taskEdit(new QLineEdit(this))
     , m_startButton(new QPushButton("スタート", this))
     , m_resetButton(new QPushButton("リセット", this))
     , m_timer(new QTimer(this))
@@ -20,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QFont font = m_timeLabel->font();
     font.setPointSize(48);
+    m_taskEdit->setPlaceholderText("作業内容を入力");
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
     m_modeLabel->setAlignment(Qt::AlignCenter);
@@ -31,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_modeLabel);
     mainLayout->addWidget(m_timeLabel);
+    mainLayout->addWidget(m_taskEdit);
     mainLayout->addLayout(buttonLayout);
 
     m_timer->setInterval(1000);  // 1秒ごとに timeout を発生させる
@@ -76,6 +85,7 @@ void MainWindow::onTick()
     if (m_remainingSeconds == 0) {
         if(m_mode == Mode::Work) {
             m_mode = Mode::Break;
+            appendWorkLog();
             m_remainingSeconds = kBreakSeconds;
         } else {
             m_mode = Mode::Work;
@@ -99,4 +109,27 @@ void MainWindow::updateDisplay()
     } else {
         m_modeLabel->setText("休憩中");
     }
+}
+
+void MainWindow::appendWorkLog()
+{
+    const QString now = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm");
+    QString task = m_taskEdit->text();
+    if(task.isEmpty()) {
+        task = "未入力";
+    }
+
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dirPath);
+    QFile file(dirPath + "/work_log.csv");
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        return;
+    }
+    int WorkSeconds = kWorkSeconds / 60;
+    QTextStream out(&file);
+    if(file.size() == 0) {
+        out.setGenerateByteOrderMark(true);
+        out << "日時,作業内容,作業時間(分)\n";
+    }
+    out << now << "," << task << "," << WorkSeconds << "\n";
 }
