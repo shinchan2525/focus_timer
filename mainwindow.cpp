@@ -9,6 +9,8 @@
 #include <QDateTime>
 #include <QFile>
 #include <QTextStream>
+#include <QDir>
+#include <QStandardPaths>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -117,11 +119,17 @@ void MainWindow::appendWorkLog()
         task = "未入力";
     }
 
-    QFile file("work_log.csv");
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dirPath);
+    QFile file(dirPath + "/work_log.csv");
     if (!file.open(QIODevice::Append | QIODevice::Text)) {
         return;
     }
     int WorkSeconds = kWorkSeconds / 60;
     QTextStream out(&file);
+    if(file.size() == 0) {
+        out.setGenerateByteOrderMark(true);
+        out << "日時,作業内容,作業時間(分)\n";
+    }
     out << now << "," << task << "," << WorkSeconds << "\n";
 }
