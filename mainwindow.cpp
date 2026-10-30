@@ -9,10 +9,12 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
+    , m_modeLabel(new QLabel("作業中",this))
     , m_timeLabel(new QLabel(this))
     , m_startButton(new QPushButton("スタート", this))
     , m_resetButton(new QPushButton("リセット", this))
     , m_timer(new QTimer(this))
+    , m_mode(Mode::Work)
     , m_remainingSeconds(kWorkSeconds)
 {
     setWindowTitle("作業タイマー");
@@ -21,12 +23,14 @@ MainWindow::MainWindow(QWidget *parent)
     font.setPointSize(48);
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
+    m_modeLabel->setAlignment(Qt::AlignCenter);
 
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_startButton);
     buttonLayout->addWidget(m_resetButton);
 
     auto *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(m_modeLabel);
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addLayout(buttonLayout);
 

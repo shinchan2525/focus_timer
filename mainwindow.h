@@ -19,13 +19,18 @@ private slots:
     void onTick();
 
 private:
+    enum class Mode{Work, Break};
+
     void updateDisplay();
 
     static constexpr int kWorkSeconds = 25 * 60;
+    static constexpr int kBreakSeconds = 5 * 60;
 
+    QLabel *m_modeLabel;
     QLabel *m_timeLabel;
     QPushButton *m_startButton;
     QPushButton *m_resetButton;
     QTimer *m_timer;
+    Mode m_mode; // 現在のモード　(　作業中 or 休憩中　)
     int m_remainingSeconds;
 };
