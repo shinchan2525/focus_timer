@@ -5,11 +5,13 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QLineEdit>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m_modeLabel(new QLabel("作業中",this))
     , m_timeLabel(new QLabel(this))
+    , m_taskEdit(new QLineEdit(this))
     , m_startButton(new QPushButton("スタート", this))
     , m_resetButton(new QPushButton("リセット", this))
     , m_timer(new QTimer(this))
@@ -20,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QFont font = m_timeLabel->font();
     font.setPointSize(48);
+    m_taskEdit->setPlaceholderText("作業内容を入力");
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
     m_modeLabel->setAlignment(Qt::AlignCenter);
@@ -31,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_modeLabel);
     mainLayout->addWidget(m_timeLabel);
+    mainLayout->addWidget(m_taskEdit);
     mainLayout->addLayout(buttonLayout);
 
     m_timer->setInterval(1000);  // 1秒ごとに timeout を発生させる

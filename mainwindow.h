@@ -4,6 +4,7 @@
 
 class QLabel;
 class QPushButton;
+class QLineEdit;
 class QTimer;
 
 class MainWindow : public QWidget
@@ -28,6 +29,7 @@ private:
 
     QLabel *m_modeLabel;
     QLabel *m_timeLabel;
+    QLineEdit *m_taskEdit;
     QPushButton *m_startButton;
     QPushButton *m_resetButton;
     QTimer *m_timer;
