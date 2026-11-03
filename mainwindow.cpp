@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_taskEdit(new QLineEdit(this))
     , m_startButton(new QPushButton("スタート", this))
     , m_resetButton(new QPushButton("リセット", this))
+    , m_todayLabel(new QLabel(this))
     , m_timer(new QTimer(this))
     , m_mode(Mode::Work)
     , m_remainingSeconds(kWorkSeconds)
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
     m_modeLabel->setAlignment(Qt::AlignCenter);
+    m_todayLabel->setText("今日の作業:0分");
 
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_startButton);
@@ -41,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addWidget(m_taskEdit);
     mainLayout->addLayout(buttonLayout);
+    mainLayout->addWidget(m_todayLabel);
 
     m_timer->setInterval(1000);  // 1秒ごとに timeout を発生させる
 

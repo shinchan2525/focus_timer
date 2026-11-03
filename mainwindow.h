@@ -32,7 +32,9 @@ private:
     QLineEdit *m_taskEdit;
     QPushButton *m_startButton;
     QPushButton *m_resetButton;
+    QLabel *m_todayLabel;
     QTimer *m_timer;
+
     Mode m_mode; // 現在のモード　(　作業中 or 休憩中　)
     int m_remainingSeconds;
 };
