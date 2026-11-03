@@ -26,6 +26,7 @@ private:
     void appendWorkLog();
     QString logFilePath() const;
     int todayTotalMinutes() const;
+    void updateTodayLabel();
 
     static constexpr int kWorkSeconds = 25 * 60;
     static constexpr int kBreakSeconds = 5 * 60;

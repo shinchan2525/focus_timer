@@ -33,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
     m_modeLabel->setAlignment(Qt::AlignCenter);
-    m_todayLabel->setText(QString("今日の作業:%1分").arg(todayTotalMinutes()));
 
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_startButton);
@@ -53,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_resetButton, &QPushButton::clicked, this, &MainWindow::onReset);
 
     updateDisplay();
+    updateTodayLabel();
     resize(320, 200);
 }
 
@@ -90,6 +90,7 @@ void MainWindow::onTick()
         if(m_mode == Mode::Work) {
             m_mode = Mode::Break;
             appendWorkLog();
+            updateTodayLabel();
             m_remainingSeconds = kBreakSeconds;
         } else {
             m_mode = Mode::Work;
@@ -165,4 +166,9 @@ int MainWindow::todayTotalMinutes() const
         }
     }
     return total;
+}
+
+void MainWindow::updateTodayLabel()
+{
+    m_todayLabel->setText(QString("今日の作業:%1分").arg(todayTotalMinutes()));
 }
