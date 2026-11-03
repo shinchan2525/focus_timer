@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QDir>
 #include <QStandardPaths>
+#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -19,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_taskEdit(new QLineEdit(this))
     , m_startButton(new QPushButton("スタート", this))
     , m_resetButton(new QPushButton("リセット", this))
+    , m_todayLabel(new QLabel(this))
     , m_timer(new QTimer(this))
     , m_mode(Mode::Work)
     , m_remainingSeconds(kWorkSeconds)
@@ -41,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addWidget(m_taskEdit);
     mainLayout->addLayout(buttonLayout);
+    mainLayout->addWidget(m_todayLabel);
 
     m_timer->setInterval(1000);  // 1秒ごとに timeout を発生させる
 
@@ -49,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_resetButton, &QPushButton::clicked, this, &MainWindow::onReset);
 
     updateDisplay();
+    updateTodayLabel();
     resize(320, 200);
 }
 
@@ -86,6 +90,7 @@ void MainWindow::onTick()
         if(m_mode == Mode::Work) {
             m_mode = Mode::Break;
             appendWorkLog();
+            updateTodayLabel();
             m_remainingSeconds = kBreakSeconds;
         } else {
             m_mode = Mode::Work;
@@ -119,12 +124,11 @@ void MainWindow::appendWorkLog()
         task = "未入力";
     }
 
-    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(dirPath);
-    QFile file(dirPath + "/work_log.csv");
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+    QFile file(logFilePath());
+    if(!file.open(QIODevice::Append | QIODevice::Text)) {
         return;
     }
+
     int WorkSeconds = kWorkSeconds / 60;
     QTextStream out(&file);
     if(file.size() == 0) {
@@ -132,4 +136,39 @@ void MainWindow::appendWorkLog()
         out << "日時,作業内容,作業時間(分)\n";
     }
     out << now << "," << task << "," << WorkSeconds << "\n";
+}
+
+QString MainWindow::logFilePath() const
+{
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dirPath);
+    return dirPath + "/work_log.csv";
+}
+
+int MainWindow::todayTotalMinutes() const
+{
+    const QString today = QDate::currentDate().toString("yyyy-MM-dd");
+    QFile file(logFilePath());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return 0;
+    }
+    QTextStream in(&file);
+    int total = 0;
+    while (!in.atEnd()) {
+        const QString line = in.readLine();
+        // ここで1行ごとの処理
+        const QStringList parts = line.split(',');
+        if(parts.size()<3) {
+            continue;
+        }
+        if(parts[0].startsWith(today)) {
+            total += parts[2].toInt();
+        }
+    }
+    return total;
+}
+
+void MainWindow::updateTodayLabel()
+{
+    m_todayLabel->setText(QString("今日の作業:%1分").arg(todayTotalMinutes()));
 }

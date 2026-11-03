@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QString>
 
 class QLabel;
 class QPushButton;
@@ -23,6 +24,9 @@ private:
     enum class Mode{Work, Break};
     void updateDisplay();
     void appendWorkLog();
+    QString logFilePath() const;
+    int todayTotalMinutes() const;
+    void updateTodayLabel();
 
     static constexpr int kWorkSeconds = 25 * 60;
     static constexpr int kBreakSeconds = 5 * 60;
@@ -32,7 +36,9 @@ private:
     QLineEdit *m_taskEdit;
     QPushButton *m_startButton;
     QPushButton *m_resetButton;
+    QLabel *m_todayLabel;
     QTimer *m_timer;
+
     Mode m_mode; // 現在のモード　(　作業中 or 休憩中　)
     int m_remainingSeconds;
 };
