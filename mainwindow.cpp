@@ -122,12 +122,11 @@ void MainWindow::appendWorkLog()
         task = "未入力";
     }
 
-    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(dirPath);
-    QFile file(dirPath + "/work_log.csv");
-    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+    QFile file(logFilePath());
+    if(!file.open(QIODevice::Append | QIODevice::Text)) {
         return;
     }
+
     int WorkSeconds = kWorkSeconds / 60;
     QTextStream out(&file);
     if(file.size() == 0) {
@@ -135,4 +134,11 @@ void MainWindow::appendWorkLog()
         out << "日時,作業内容,作業時間(分)\n";
     }
     out << now << "," << task << "," << WorkSeconds << "\n";
+}
+
+QString MainWindow::logFilePath() const
+{
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dirPath);
+    return dirPath + "/work_log.csv";
 }
