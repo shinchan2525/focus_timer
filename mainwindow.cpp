@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QDir>
 #include <QStandardPaths>
+#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -32,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_timeLabel->setFont(font);
     m_timeLabel->setAlignment(Qt::AlignCenter);
     m_modeLabel->setAlignment(Qt::AlignCenter);
-    m_todayLabel->setText("今日の作業:0分");
+    m_todayLabel->setText(QString("今日の作業:%1分").arg(todayTotalMinutes()));
 
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_startButton);
@@ -141,4 +142,27 @@ QString MainWindow::logFilePath() const
     const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(dirPath);
     return dirPath + "/work_log.csv";
+}
+
+int MainWindow::todayTotalMinutes() const
+{
+    const QString today = QDate::currentDate().toString("yyyy-MM-dd");
+    QFile file(logFilePath());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return 0;
+    }
+    QTextStream in(&file);
+    int total = 0;
+    while (!in.atEnd()) {
+        const QString line = in.readLine();
+        // ここで1行ごとの処理
+        const QStringList parts = line.split(',');
+        if(parts.size()<3) {
+            continue;
+        }
+        if(parts[0].startsWith(today)) {
+            total += parts[2].toInt();
+        }
+    }
+    return total;
 }
